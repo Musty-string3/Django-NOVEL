@@ -1,0 +1,25 @@
+version: '3'  # ファイルのバージョンを指定
+
+# サービスの定義
+services:
+  django:   # サービス名
+    build:  # ビルド設定
+      context: ./containers    # Dockerfileがあるディレクトリまでの相対パス
+      dockerfile: Dockerfile   # Dockerfileのファイル名
+
+    # 作成するコンテナ名の指定
+    container_name: django
+
+    # 使用するポートの設定
+    ports:
+      - "8000:8000" # Djangoのデフォルトの開発サーバーポート
+
+    # 対話的なセッションやコマンドラインの操作を許可する
+    tty: true
+
+    volumes:
+      # ローカルの作業ディレクトリと仮想環境の作業ディレクトリの対応づけ（manage.pyのあるディレクトリを指定する）
+      - ${SRC_PATH}:/root/workspace
+
+    # コンテナの起動とともにrunserverしてくれる
+    command: python3 /root/workspace/manage.py runserver 0.0.0.0:8000

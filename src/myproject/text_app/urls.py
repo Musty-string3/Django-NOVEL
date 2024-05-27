@@ -3,5 +3,6 @@ from . import views
 
 app_name = 'text_app'
 urlpatterns = [
-    path('novels/', views.IndexNovel.as_view(), name='novel_index'),
+    path('novels/', views.IndexNovelView.as_view(), name='index_novel'),
+    path('novel/<int:pk>', views.DetailNovelView.as_view(), name='detail_novel'),
 ]

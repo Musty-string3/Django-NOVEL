@@ -13,6 +13,18 @@ class IndexNovelView(View):
         })
 
 
+class CreateNovelView(View):
+    template_name = 'novel/create.html'
+    def get(self, request, *args, **kwargs):
+        
+        return render(request, self.template_name, {
+            
+        })
+
+    def post(self, request, *args, **kwargs):
+        return redirect('text_app:index_novel')
+
+
 class DetailNovelView(View):
     template_name = 'novel/detail.html'
     def get(self, request, pk, *args, **kwargs):

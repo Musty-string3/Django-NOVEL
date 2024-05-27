@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}小説詳細{% endblock %}
 {% block contents %}
-<div class="row">
-    
-</div>
+<legend><h3>小説名：{{ novel.title }}</h3></legend>
+<p class='col-3'>投稿者名：{{ novel.created_by.username }}</p>
+<p class='col-4'>タイトル名：{{ novel.title }}</p>
+<p class='col-3'>投稿日時：{{ novel.created_at }}</p>
 {% endblock %}

@@ -15,8 +15,8 @@
     <tbody>
         {% for novel in novels %}
             <tr>
-                <td><a href="{% url 'text_app:detail_novel' pk=novel.pk %}">{{ novel.created_by.username }}</a></td>
-                <td>{{ novel.title }}</td>
+                <td>{{ novel.created_by.username }}</td>
+                <td><a href="{% url 'text_app:detail_novel' pk=novel.pk %}">{{ novel.title }}</a></td>
                 <td>{{ novel.created_at }}</td>
             </tr>
         {% endfor %}

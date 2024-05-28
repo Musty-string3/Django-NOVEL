@@ -5,4 +5,10 @@
 <p class='col-3'>投稿者名：{{ novel.created_by.username }}</p>
 <p class='col-4'>タイトル名：{{ novel.title }}</p>
 <p class='col-3'>投稿日時：{{ novel.created_at }}</p>
+<div class="row">
+    <div class="col2">
+        <a class='btn btn-danger' href="{% url 'text_app:delete_novel' pk=novel.pk %}">削除</a>
+        <a class='btn btn-info' href="{% url 'text_app:edit_novel' pk=novel.pk %}">編集</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,7 +1,7 @@
 from django.db import models
 from accounts.models import CustomUser
 
-class NOVEL(models.Model):
+class Novel(models.Model):
     """小説モデル"""
     title = models.CharField(verbose_name="タイトル", max_length=50, null=False, blank=False)
     created_by = models.ForeignKey(CustomUser, verbose_name="作成者", on_delete=models.CASCADE, null=False, blank=False)

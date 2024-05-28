@@ -5,7 +5,7 @@ from .models import *
 class NovelForm(forms.ModelForm):
     """小説モデルのフォーム"""
     class Meta:
-        model = NOVEL   # !利用するモデル
+        model = Novel   # !利用するモデル
         fields = ('title', 'is_public') # !利用するフィールド
         widgets = {
             'title': forms.TextInput(attrs={

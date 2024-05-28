@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views import View
-from .models import *
 
-class IndexNovelView(View):
+from .models import *
+from .froms import *
+
+class NovelIndexView(View):
     template_name = 'novel/index.html'
     def get(self, request, *args, **kwargs):
         # TODO filterで公開非公開
@@ -13,19 +15,30 @@ class IndexNovelView(View):
         })
 
 
-class CreateNovelView(View):
-    template_name = 'novel/create.html'
+class NovelNewView(View):
+    template_name = 'novel/new.html'
     def get(self, request, *args, **kwargs):
-        
+        form = NovelForm()
         return render(request, self.template_name, {
-            
+            'form': form,
         })
 
     def post(self, request, *args, **kwargs):
-        return redirect('text_app:index_novel')
+        form = NovelForm(request.POST)
+        if form.is_valid():
+            novel = form.save(commit=False)
+            novel.created_by = request.user
+            novel.save()
+            messages.success(request, '小説を作成しました')
+            return redirect('text_app:index_novel')
+        messages.error(request, '小説の作成に失敗しました')
+        return render(request, self.template_name, {
+            'form': form,
+        })
 
 
-class DetailNovelView(View):
+
+class NovelDetailView(View):
     template_name = 'novel/detail.html'
     def get(self, request, pk, *args, **kwargs):
         try:

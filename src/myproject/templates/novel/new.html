@@ -5,7 +5,8 @@
     <legend><h3>小説を作成しよう！</h3></legend>
     <form action="" method='post'>
         {% csrf_token %}
-        <button type='button'>新規作成</button>
+        {{ form.as_p }}
+        <button type='submit' class='btn btn-info'>新規作成</button>
     </form>
 </fieldset>
 {% endblock  %}

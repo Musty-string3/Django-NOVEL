@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %}小説の編集{% endblock %}
 {% block contents %}
-<fieldset>
-    <legend><h3>小説の編集</h3></legend>
-    <form action="{{ request.path }}" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-success" type="submit">編集</button>
-    </form>
-</fieldset>
+<div class="container">
+    <fieldset>
+        <legend><h3>小説の編集</h3></legend>
+        <form action="{{ request.path }}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-success" type="submit">編集</button>
+        </form>
+    </fieldset>
+</div>
 {% endblock %}

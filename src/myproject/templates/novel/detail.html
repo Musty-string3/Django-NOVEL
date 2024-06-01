@@ -1,14 +1,67 @@
 {% extends "base.html" %}
 {% block title %}小説詳細{% endblock %}
+{% block style %}
+.character-radio {
+    display: none;
+}
+.character-label {
+    cursor: pointer;
+}
+.character-label img {
+    border-radius: 50%;
+    margin: 5px;
+    width: 50px;
+    height: 50px;
+}
+.character-radio:checked + .character-label img {
+    border: 2px solid #000;
+}
+{% endblock %}
 {% block contents %}
-<legend><h3>小説名：{{ novel.title }}</h3></legend>
-<p class='col-3'>投稿者名：{{ novel.created_by.username }}</p>
-<p class='col-4'>タイトル名：{{ novel.title }}</p>
-<p class='col-3'>投稿日時：{{ novel.created_at }}</p>
-<div class="row">
-    <div class="col2">
-        <a class='btn btn-danger' href="{% url 'text_app:delete_novel' pk=novel.pk %}">削除</a>
-        <a class='btn btn-info' href="{% url 'text_app:edit_novel' pk=novel.pk %}">編集</a>
+<div class="bg-info-subtle" style='height: 100vh; width: 100vw;'>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3 pt-3">
+            <h3 class='col text-center'>{{ novel.title }}</h3>
+            <p class='col-auto mt-1 me-5'>投稿者名：
+                <a href="#">{{ novel.created_by.username }}</a>
+            </p>
+            <div class="">
+                <a class='btn btn-outline-success me-3' href="{% url 'text_app:edit_novel' pk=novel.pk %}">編集</a>
+                <a class='btn btn-outline-danger me-3' href="{% url 'text_app:delete_novel' pk=novel.pk %}">削除</a>
+            </div>
+        </div>
+        <div class="novel-chat">
+            {% for sentence in sentences %}
+                {% for speaker in sentence.speaker.all %}
+                    <div class='d-flex align-items-start mb-3'>
+                        <div class="me-2 text-center">
+                            <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle" width="40" height="40">
+                            <div>{{ speaker.name }}</div>
+                        </div>
+                        <div class="bg-body-secondary p-3 rounded flex-wrap">
+                            <p class='mb-0'>{{ sentence.text }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            <form action="" method='POST'>
+                {% csrf_token %}
+                {{ sentence_form.as_p }}
+                <div>
+                    {{ character_form.character.errors }}
+                    {% for widget in character_form.character %}
+                        <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
+                        <label for="char-{{ widget.data.value }}" class="character-label">
+                            <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}">
+                        </label>
+                    {% endfor %}
+                </div>
+                <button class='btn btn-success'>送信</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

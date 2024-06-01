@@ -1,25 +1,33 @@
 {% extends "base.html" %}
 {% block title %}小説一覧{% endblock %}
 {% block contents %}
-<div class="row">
-    <h2>みんなの小説一覧画面</h2>
-</div>
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>投稿者</th>
-            <th>小説名前</th>
-            <th>投稿日時</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for novel in novels %}
+<div class="container">
+    <div class="row">
+        <h2>みんなの小説一覧画面</h2>
+    </div>
+    <table class="table table-hover">
+        <thead>
             <tr>
-                <td>{{ novel.created_by.username }}</td>
-                <td><a href="{% url 'text_app:detail_novel' pk=novel.pk %}">{{ novel.title }}</a></td>
-                <td>{{ novel.created_at }}</td>
+                <th>投稿者</th>
+                <th>小説名前</th>
+                <th>登場人物人数</th>
+                <th>会話数</th>
+                <th>投稿日時</th>
+                <th>最終更新日日時</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for novel in novels %}
+                <tr>
+                    <td>{{ novel.created_by.username }}</td>
+                    <td><a href="{% url 'text_app:detail_novel' pk=novel.pk %}">{{ novel.title }}</a></td>
+                    <td>{{ novel.characters_count }}</td>
+                    <td>{{ novel.sentences_count }}</td>
+                    <td>{{ novel.created_at }}</td>
+                    <td>{{ novel.updated_at }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock  %}

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views import View
+from django.db.models import Count
 
 from .models import *
 from .forms import *
@@ -10,7 +11,10 @@ class NovelIndexView(View):
 
     def get(self, request, *args, **kwargs):
         # TODO filterで公開非公開
-        novels = Novel.objects.all()
+        novels = Novel.objects.annotate(
+            characters_count = Count('sentence__speaker', distinct=True),
+            sentences_count = Count('sentence', distinct=True),
+        )
         return render(request, self.template_name,{
             "novels": novels,
         })
@@ -44,17 +48,46 @@ class NovelDetailView(View):
     template_name = 'novel/detail.html'
 
     def get(self, request, pk, *args, **kwargs):
+        sentence_form = SentenceForm()
+        character_form = CharacterForm()
         try:
             novel = Novel.objects.get(id=pk)
         except Novel.DoesNotExist:
             messages.error(request, '指定された小説は存在しません。')
             return redirect('text_app:index_novel')
+
+        sentences = Sentence.objects.filter(novel=novel).prefetch_related('speaker')
         return render(request, self.template_name, {
+            "sentence_form": sentence_form,
+            "character_form": character_form,
             "novel": novel,
+            "sentences": sentences,
         })
 
     def post(self, request, pk, *args, **kwargs):
-        return redirect('text_app:detail_novel')
+        sentence_form = SentenceForm(request.POST)
+        character_form = CharacterForm(request.POST)
+        try:
+            novel = Novel.objects.get(pk=pk)
+        except Novel.DoesNotExist:
+            messages.error(request, '指定された小説は存在しません。')
+            return redirect('text_app:detail_novel', pk=pk)
+
+        if sentence_form.is_valid() and character_form.is_valid():
+            sentence = sentence_form.save(commit=False)
+            sentence.novel = novel
+            sentence.save()
+            character = character_form.cleaned_data['character']
+            sentence.speaker.add(character)
+            sentence.save()
+            return redirect('text_app:detail_novel', pk=pk)
+
+        messages.error(request, '小説の保存に失敗しました。')
+        return render(request, self.template_name, {
+            'sentence_form': sentence_form,
+            'character_form': character_form,
+            'novel': novel,
+        })
 
 
 class NovelEditView(View):

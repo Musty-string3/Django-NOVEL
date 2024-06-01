@@ -16,3 +16,35 @@ class NovelForm(forms.ModelForm):
                 'class': 'form-check-input',
             }),
         }
+
+
+class SentenceForm(forms.ModelForm):
+    """文章モデルのフォーム"""
+    class Meta():
+        model = Sentence
+        fields = {'text', }
+        widgets = {
+            'text': forms.TextInput(attrs={
+                'placeholder': 'テキストを入力',
+                'class': 'form-control',
+            }),
+        }
+
+
+class CharacterIconWidget(forms.widgets.RadioSelect):
+    """アイコンを表示させるためのhtml"""
+    template_name = 'widgets/character_icon_widget.html'
+
+class CharacterChoiceField(forms.ModelChoiceField):
+    """選択肢のラベルとして表示される内容を定義"""
+    def label_from_instance(self, obj):
+        return obj
+
+class CharacterForm(forms.Form):
+    """キャラクターモデルのフォール"""
+    character = CharacterChoiceField(
+        queryset = Character.objects.all(),
+        widget = CharacterIconWidget,
+        empty_label = None,
+        label = 'キャラクターのアイコンを選択してください'
+    )

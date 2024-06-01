@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 {% block title %}小説作成{% endblock  %}
 {% block contents %}
-<fieldset>
-    <legend><h3>小説を作成しよう！</h3></legend>
-    <form action="" method='post'>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type='submit' class='btn btn-success'>新規作成</button>
-    </form>
-</fieldset>
+<div class="container">
+    <fieldset>
+        <legend><h3>小説を作成しよう！</h3></legend>
+        <form action="" method='post'>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type='submit' class='btn btn-success'>新規作成</button>
+        </form>
+    </fieldset>
+</div>
 {% endblock  %}

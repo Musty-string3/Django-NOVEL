@@ -15,3 +15,33 @@ class Novel(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Character(models.Model):
+    """キャラクターモデル"""
+    name = models.CharField(verbose_name='名前', max_length=50, null=False, blank=False)
+    icon = models.ImageField(verbose_name='アイコン', upload_to='images/%Y/%m/%d/') # 保存先はMEDIA_ROOT直下
+    created_at = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name='更新日時', auto_now=True)
+
+    class Meta():
+        verbose_name_plural = 'キャラクター'
+        db_table = 'character'
+
+    def __str__(self):
+        return self.name
+
+class Sentence(models.Model):
+    """文章モデル"""
+    text = models.CharField(verbose_name='文章', max_length=255, null=False, blank=False)
+    speaker = models.ManyToManyField(Character, verbose_name='発言者', blank=False)
+    novel = models.ForeignKey(Novel, verbose_name='小説', on_delete=models.CASCADE, null=False, blank=False)
+    created_at = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
+    updated_at = models.DateTimeField(verbose_name='更新日時', auto_now=True)
+
+    class Meta():
+        verbose_name_plural = '文章'
+        db_table = 'sentence'
+
+    def __str__(self):
+        return self.text

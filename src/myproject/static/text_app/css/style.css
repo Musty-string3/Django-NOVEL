@@ -1,0 +1,27 @@
+/* 共通 */
+
+.list_none {
+    list-style: none;
+}
+
+.character_img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+
+/* text_app:detail_novel */
+
+.character-radio {
+    display: none;
+}
+.character-label {
+    cursor: pointer;
+}
+.character-radio:checked + .character-label img {
+    border: 2px solid #000;
+}
+.message_field {
+    margin-bottom: 50px;
+}

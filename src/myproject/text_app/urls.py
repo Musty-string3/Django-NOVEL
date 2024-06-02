@@ -8,4 +8,7 @@ urlpatterns = [
     path('novel/new/', views.NovelNewView.as_view(), name='new_novel'),
     path('novel/edit/<int:pk>', views.NovelEditView.as_view(), name='edit_novel'),
     path('novel/delete/<int:pk>', views.NovelDeleteView.as_view(), name='delete_novel'),
+
+    path('characters/', views.CharacterIndexView.as_view(), name='index_character'),
+    path('character/<int:pk>', views.CharacterDetailView.as_view(), name='detail_character'),
 ]

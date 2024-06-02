@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block style_css %}
+<link rel="stylesheet" href="{% static 'text_app/css/style.css' %}?v=2024-06-02">
+{% endblock %}
+
+{% block title %}キャラクター一覧{% endblock %}
+{% block contents %}
+<div class="container">
+    <div class="d-flex justify-content-center align-items-center">
+        <h3 class='text_center'>キャラクター一覧</h3>
+        <a href="#" class=''>キャラ作成</a>
+    </div>
+    <ul class='col-10 mx-auto m-3 list_none list-group list-group-flush'>
+        {% for character, form in forms %}
+            <div class="row justify-content-center">
+                <li class='m-1 list-group-item'>
+                    <div class='d-flex'>
+                        <img src="{{ character.icon.url }}" alt="{{ character.name }}" class="col-2 rounded-circle character_img mb-1" width="40" height="40">
+                        <a href="{% url 'text_app:detail_character' pk=character.pk %}" class='col-3 ms-3'>{{ character.name }}</a>
+                        <p class='col-lg-3'>作成：{{ character.created_at }}</p>
+                        <p class='col-lg-3'>更新：{{ character.updated_at }}</p>
+                        <button type="button" class="col-auto btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#CharacterEditModal{{ character.pk }}">編集</button>
+                        <!-- character edit Modal -->
+                        <div class="modal fade" id="CharacterEditModal{{ character.pk }}" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5 d-flex" id="EditModalLabel">
+                                            <img src="{{ character.icon.url }}" alt="{{ character.name }}" class="me-1 rounded-circle character_img" width="35" height="35">
+                                            {{ character.name }}の編集
+                                        </h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="" method='post'>
+                                            {% csrf_token %}
+                                            <div class='form-group'>
+                                                <input type="text" class='form-control' name='name' value='{{ character.name }}'>
+                                                <img src="{{ character.icon.url }}" alt="{{ character.name }}" class="me-1 rounded-circle character_img" width="35" height="35">
+                                                <input type="file" class="form-control-file" name="icon">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">削除</button>
+                                        <button type="button" class="btn btn-outline-success">保存</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ここまで　character edit Modal -->
+                    </div>
+                </li>
+            </div>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

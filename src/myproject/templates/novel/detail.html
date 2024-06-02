@@ -1,36 +1,32 @@
 {% extends "base.html" %}
-{% block title %}小説詳細{% endblock %}
-{% block style %}
-.character-radio {
-    display: none;
-}
-.character-label {
-    cursor: pointer;
-}
-.character-label img {
-    border-radius: 50%;
-    margin: 5px;
-    width: 50px;
-    height: 50px;
-}
-.character-radio:checked + .character-label img {
-    border: 2px solid #000;
-}
+{% load static %}
+{% block style_css %}
+<link rel="stylesheet" href="{% static 'text_app/css/style.css' %}">
+<style>
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: lightblue;
+    }
+</style>
 {% endblock %}
+
+{% block title %}小説詳細{% endblock %}
 {% block contents %}
-<div class="bg-info-subtle" style='height: 100vh; width: 100vw;'>
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-3 pt-3">
-            <h3 class='col text-center'>{{ novel.title }}</h3>
-            <p class='col-auto mt-1 me-5'>投稿者名：
-                <a href="#">{{ novel.created_by.username }}</a>
-            </p>
-            <div class="">
-                <a class='btn btn-outline-success me-3' href="{% url 'text_app:edit_novel' pk=novel.pk %}">編集</a>
-                <a class='btn btn-outline-danger me-3' href="{% url 'text_app:delete_novel' pk=novel.pk %}">削除</a>
-            </div>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3 pt-3">
+        <h3 class='col text-center'>{{ novel.title }}</h3>
+        <p class='col-auto mt-1 me-5'>投稿者名：
+            <a href="#">{{ novel.created_by.username }}</a>
+        </p>
+        <div class="">
+            <a class='btn btn-outline-success me-3' href="{% url 'text_app:edit_novel' pk=novel.pk %}">編集</a>
+            <a class='btn btn-outline-danger me-3' href="{% url 'text_app:delete_novel' pk=novel.pk %}">削除</a>
         </div>
-        <div class="novel-chat">
+    </div>
+    <div class="col-10 mx-auto">
+        <div class="row justify-content-start">
             {% for sentence in sentences %}
                 {% for speaker in sentence.speaker.all %}
                     <div class='d-flex align-items-start mb-3'>
@@ -45,23 +41,60 @@
                 {% endfor %}
             {% endfor %}
         </div>
+    </div>
+</div>
 
-        <div class="row">
-            <form action="" method='POST'>
-                {% csrf_token %}
-                {{ sentence_form.as_p }}
-                <div>
-                    {{ character_form.character.errors }}
-                    {% for widget in character_form.character %}
-                        <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
-                        <label for="char-{{ widget.data.value }}" class="character-label">
-                            <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}">
-                        </label>
-                    {% endfor %}
-                </div>
-                <button class='btn btn-success'>送信</button>
-            </form>
+<div class="bg-white">
+    <div class="container">
+        <div class="row message_field">
+            <div class="col-md-10 mx-auto">
+                <form action="" method='POST' class='m-3'>
+                    {% csrf_token %}
+                        {{ character_form.character.errors }}
+                        {% for widget in character_form.character %}
+                            <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
+                            <label for="char-{{ widget.data.value }}" class="character-label">
+                                <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}" class="rounded-circle" width="40" height="40">
+                            </label>
+                        {% endfor %}
+                    <div class="form-group row  mt-1">
+                        <div class='col-1 text-center' id="imagePreview"></div>
+                        <div class='col-8'>
+                            {% for widget in sentence_form.text %}
+                                <input type="text" placeholder='テキストを入力' class='form-control' name='text'>
+                            {% endfor %}
+                        </div>
+                        <button class='col-2 btn btn-success'>送信</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    const imageInputs = document.querySelectorAll('.character-radio');
+    const imagePreview = document.getElementById('imagePreview');
+
+    imageInputs.forEach(input => {
+        input.addEventListener('change', function(event) {
+            const selectedRadio = event.target;
+            const selectedValue = selectedRadio.value;
+            const selectedImage = document.querySelector(`[for="char-${selectedValue}"] img`);
+
+            // 画像が選択されている場合のみ表示する
+            if (selectedImage) {
+                const img = document.createElement('img');
+                img.src = selectedImage.src;
+                img.width = 40; // 画像の幅を設定（任意）
+                img.heigth = 40;
+                img.classList.add('rounded-circle', 'character_img'); // クラスを追加
+                imagePreview.innerHTML = ''; // 既存の画像を削除
+                imagePreview.appendChild(img); // 新しい画像を表示
+            }
+        });
+    });
+</script>
+
+
 {% endblock %}

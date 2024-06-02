@@ -46,5 +46,19 @@ class CharacterForm(forms.Form):
         queryset = Character.objects.all(),
         widget = CharacterIconWidget,
         empty_label = None,
-        label = 'キャラクターのアイコンを選択してください'
+        label = 'キャラクターのアイコンを選択してください',
+        initial = Character.objects.first(),
     )
+
+
+class CharacterCreateForm(forms.ModelForm):
+    """キャラクターモデルの作成"""
+    class Meta():
+        model = Character
+        fields = ['name', 'icon', ]
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'placeholder': '名前を入力してください',
+                'class': 'form-control',
+            }),
+        }

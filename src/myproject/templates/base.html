@@ -9,8 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    {% block style_css %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
-    <style>{% block style %}{% endblock %}</style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -29,10 +29,10 @@
                         <a class="nav-link" href="{% url 'text_app:new_novel' %}">小説作成</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
+                        <a class="nav-link" href="{% url 'text_app:index_character' %}">キャラクター一覧</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link disabled">Disabled</a>
+                        <a class="nav-link disabled">キャラクター作成</a>
                     </li>
                 </ul>
             </div>

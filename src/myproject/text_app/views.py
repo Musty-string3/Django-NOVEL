@@ -130,3 +130,32 @@ class NovelDeleteView(View):
             messages.error(request, '小説の削除に失敗しました')
             return redirect('text_app:detail_novel', pk=pk)
         return redirect('text_app:index_novel')
+
+
+# Character
+
+class CharacterIndexView(View):
+    template_name = 'character/index.html'
+    def get(self, request, *args, **kwargs):
+
+        characters = Character.objects.all()
+        forms = [(character, CharacterCreateForm(instance=character)) for character in characters]
+        return render(request, self.template_name, {
+            'forms': forms,
+        })
+
+
+class CharacterDetailView(View):
+
+    def post(self, request, pk, *args, **kwargs):
+        try:
+            character = Character.objects.get(id=pk)
+        except Character.DoesNotExist:
+            messages.error(request, '指定されたキャラクターは存在しません')
+            return redirect('text_app:index_character')
+
+        form = CharacterCreateForm(request.POST, instance=character)
+        return redirect('text_app:detail_character', pk=pk)
+        return render(request, self.template_name, {
+            
+        })

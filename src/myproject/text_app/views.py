@@ -140,22 +140,53 @@ class CharacterIndexView(View):
 
         characters = Character.objects.all()
         forms = [(character, CharacterCreateForm(instance=character)) for character in characters]
+        form = CharacterCreateForm()
         return render(request, self.template_name, {
             'forms': forms,
+            'form': form,
         })
 
 
-class CharacterDetailView(View):
+class CharacterNewView(View):
+    def get(self, request, *args, **kwargs):
+        messages.info(request, '何もありませんよ？')
+        return redirect('text_app:index_character')
 
+    def post(self, request, *args, **kwargs):
+        form = CharacterCreateForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'キャラクターを作成しました')
+        else:
+            messages.error(request, 'キャラクターの作成に失敗しました')
+        return redirect('text_app:index_character')
+
+
+class CharacterEditView(View):
     def post(self, request, pk, *args, **kwargs):
         try:
-            character = Character.objects.get(id=pk)
+            character = Character.objects.get(pk=pk)
         except Character.DoesNotExist:
             messages.error(request, '指定されたキャラクターは存在しません')
             return redirect('text_app:index_character')
 
-        form = CharacterCreateForm(request.POST, instance=character)
-        return redirect('text_app:detail_character', pk=pk)
-        return render(request, self.template_name, {
-            
-        })
+        form = CharacterCreateForm(request.POST, request.FILES, instance=character)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'キャラクターの編集を行いました')
+            return redirect('text_app:index_character')
+        messages.error(request, 'キャラクターの編集ができませんでした')
+        return redirect('text_app:index_character')
+
+
+class CharacterDeleteView(View):
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            character = Character.objects.get(pk=pk)
+            character.delete()
+            messages.info(request, 'キャラクター{}の削除をしました。'.format(character.name))
+        except Character.DoesNotExist:
+            messages.error(request, '指定されたキャラクターは存在しません')
+            return redirect('text_app:index_character')
+
+        return redirect('text_app:index_character')

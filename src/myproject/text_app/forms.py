@@ -61,4 +61,7 @@ class CharacterCreateForm(forms.ModelForm):
                 'placeholder': '名前を入力してください',
                 'class': 'form-control',
             }),
+            'icon': forms.ClearableFileInput(attrs={
+                'class': 'form-control-file',
+            }),
         }

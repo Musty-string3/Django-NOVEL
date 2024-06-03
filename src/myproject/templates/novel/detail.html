@@ -31,7 +31,7 @@
                 {% for speaker in sentence.speaker.all %}
                     <div class='d-flex align-items-start mb-3'>
                         <div class="me-2 text-center">
-                            <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle" width="40" height="40">
+                            <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle character_img" width="40" height="40">
                             <div>{{ speaker.name }}</div>
                         </div>
                         <div class="bg-body-secondary p-3 rounded flex-wrap">
@@ -54,7 +54,7 @@
                         {% for widget in character_form.character %}
                             <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
                             <label for="char-{{ widget.data.value }}" class="character-label">
-                                <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}" class="rounded-circle" width="40" height="40">
+                                <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}" class="rounded-circle character_img" width="40" height="40">
                             </label>
                         {% endfor %}
                     <div class="form-group row  mt-1">

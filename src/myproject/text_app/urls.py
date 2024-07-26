@@ -13,4 +13,7 @@ urlpatterns = [
     path('characters/new', views.CharacterNewView.as_view(), name='new_character'),
     path('character/<int:pk>/edit', views.CharacterEditView.as_view(), name='edit_character'),
     path('character/<int:pk>/delete', views.CharacterDeleteView.as_view(), name='delete_character'),
+
+    path('sentence/<int:pk>/edit', views.SentenceEditView.as_view(), name='edit_sentence'),
+    path('sentence/<int:pk>/delete', views.SentenceDeleteView.as_view(), name='delete_sentence'),
 ]

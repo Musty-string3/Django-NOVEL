@@ -56,12 +56,14 @@ class NovelDetailView(View):
             messages.error(request, '指定された小説は存在しません。')
             return redirect('text_app:index_novel')
 
+        novel_edit_form = NovelForm(instance=novel)
         sentences = Sentence.objects.filter(novel=novel).prefetch_related('speaker')
         return render(request, self.template_name, {
-            "sentence_form": sentence_form,
-            "character_form": character_form,
-            "novel": novel,
-            "sentences": sentences,
+            "sentence_form":   sentence_form,
+            "character_form":  character_form,
+            "novel_edit_form": novel_edit_form,
+            "novel":           novel,
+            "sentences":       sentences,
         })
 
     def post(self, request, pk, *args, **kwargs):
@@ -91,21 +93,12 @@ class NovelDetailView(View):
 
 
 class NovelEditView(View):
-    template_name = 'novel/edit.html'
     def get_novel_or_redirect(self, pk):
         try:
             return Novel.objects.get(pk=pk)
         except Novel.DoesNotExist:
             messages.error(self.request, '指定された小説は存在しません')
             return redirect('text_app:index_novel')
-
-    def get(self, request, pk, *args, **kwargs):
-        novel = self.get_novel_or_redirect(pk)
-        form = NovelForm(instance=novel)
-        return render(request, self.template_name, {
-            'form': form,
-            'novel': novel,
-        })
 
     def post(self, request, pk, *args, **kwargs):
         novel = self.get_novel_or_redirect(pk)
@@ -190,3 +183,29 @@ class CharacterDeleteView(View):
             return redirect('text_app:index_character')
 
         return redirect('text_app:index_character')
+
+
+class SentenceEditView(View):
+    def post(self, request, pk, *args, **kwargs):
+        print(pk)
+        try:
+            sentence = Sentence.objects.get(pk=pk)
+        except Sentence.DoesNotExist:
+            messages.error(request, "指定された文章は存在しません")
+            return redirect("text_app:index_novel", pk=pk)
+        print("文章の編集")
+        messages.info(request, "文章の編集を行いました。")
+        return redirect("text_app:detail_novel", pk=sentence.novel.id)
+
+
+class SentenceDeleteView(View):
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            sentence = Sentence.objects.get(pk=pk)
+            sentence.delete()
+        except Sentence.DoesNotExist:
+            messages(request, "指定された文章は存在しません")
+            return redirect('text_app:detail_novel', pk=sentence.novel.id)
+
+        messages.info(request, "文章を削除しました。")
+        return redirect('text_app:detail_novel', pk=sentence.novel.id)

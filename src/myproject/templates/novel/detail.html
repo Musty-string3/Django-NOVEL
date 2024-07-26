@@ -17,26 +17,24 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3 pt-3">
         <h3 class='col text-center'>{{ novel.title }}</h3>
-        <p class='col-auto mt-1 me-5'>投稿者名：
-            <a href="#">{{ novel.created_by.username }}</a>
+        <p class='col-auto mt-1 me-4'>投稿者名：
+            <a href="#">リンク先作ってない{{ novel.created_by.username }}</a>
         </p>
-        <div class="">
-            <a class='btn btn-outline-success me-3' href="{% url 'text_app:edit_novel' pk=novel.pk %}">編集</a>
-            <a class='btn btn-outline-danger me-3' href="{% url 'text_app:delete_novel' pk=novel.pk %}">削除</a>
-        </div>
+        <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#NovelEditModal">編集</button>
     </div>
     <div class="col-10 mx-auto">
         <div class="row justify-content-start">
             {% for sentence in sentences %}
                 {% for speaker in sentence.speaker.all %}
+                    <span class="mb-1">{{ speaker.name }}</span>
                     <div class='d-flex align-items-start mb-3'>
                         <div class="me-2 text-center">
                             <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle character_img" width="40" height="40">
-                            <div>{{ speaker.name }}</div>
                         </div>
                         <div class="bg-body-secondary p-3 rounded flex-wrap">
                             <p class='mb-0'>{{ sentence.text }}</p>
                         </div>
+                        {% include "novel/_modal_edit_novel.html" %}
                     </div>
                 {% endfor %}
             {% endfor %}
@@ -44,7 +42,7 @@
     </div>
 </div>
 
-<div class="bg-white">
+<div class="bg-white ">
     <div class="container">
         <div class="row message_field">
             <div class="col-md-10 mx-auto">
@@ -65,6 +63,7 @@
                             {% endfor %}
                         </div>
                         <button class='col-2 btn btn-success'>送信</button>
+                        {% comment %} <a href="{% url 'text_app:delete_sentence' sentence.id %}" class="btn btn-danger">削除</a> {% endcomment %}
                     </div>
                 </form>
             </div>

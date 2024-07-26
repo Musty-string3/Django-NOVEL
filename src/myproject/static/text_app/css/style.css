@@ -10,6 +10,15 @@
     object-fit: cover;
 }
 
+/* トップページの画像 */
+.fullscreen-background {
+    background-image: url("/static/text_app/img/トップページ用画像.jpg");
+    background-size: cover;
+    background-position: center center;
+    height: 100vh; /* 画面全体に画像を配置する */
+    overflow: hidden; /* 画面上部の空白を無くしてくれる */
+}
+
 
 /* text_app:detail_novel */
 

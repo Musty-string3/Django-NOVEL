@@ -1,11 +1,31 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}トップページ{% endblock %}
 {% block contents %}
-<div class="row">
-    <fieldset>
-        <legend><h2>ようこそ！！</h2></legend>
-        <p>早速小説作りますか！</p>
-        <h3>ここに最新の小説一覧画面作る</h3>
-    </fieldset>
+<div class="fullscreen-background">
+    <div class="container mt-5">
+        <div class="row">
+            <fieldset>
+                <legend><h2>作成した小説を自動で動画にするサービスを提供します。</h2></legend>
+                <p>早速小説作りますか！</p>
+                <h3>最新の小説</h3>
+            </fieldset>
+        </div>
+        <div class="col-10 mx-auto">
+            <div class="row mt-3">
+                {% for novel in last_three_novels %}
+                    <div class="col-4">
+                        <a href="{% url 'text_app:detail_novel' pk=novel.id %}">{{ novel.title }}</a>
+                        <p>{{ novel.created_by }}</p>
+                        <dl>
+                            <dt>投稿者：{{ novel.created_by }}</dt>
+                            <dd>会話数：{{ novel.sentence_count }}</dd>
+                        </dl>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

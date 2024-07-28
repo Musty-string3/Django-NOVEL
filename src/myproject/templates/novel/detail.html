@@ -22,16 +22,16 @@
         </p>
         <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#NovelEditModal">編集</button>
     </div>
-    <div class="col-10 mx-auto">
+    <div class="col-md-8 col-10 mx-auto message_field_bottom" id="message_area">
         <div class="row justify-content-start">
             {% for sentence in sentences %}
                 {% for speaker in sentence.speaker.all %}
-                    <span class="mb-1">{{ speaker.name }}</span>
+                    <span class="mb-1" id='speaker_name_{{ speaker.id }}'>{{ speaker.name }}</span>
                     <div class='d-flex align-items-start mb-3'>
                         <div class="me-2 text-center">
-                            <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle character_img" width="40" height="40">
+                            <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle character_img" id='speaker_icon_{{ speaker.id }}' width="40" height="40">
                         </div>
-                        <div class="bg-body-secondary p-3 rounded flex-wrap">
+                        <div class="bg-body-secondary p-3 rounded flex-wrap" id='sentence_text_{{ sentence.id }}'>
                             <p class='mb-0'>{{ sentence.text }}</p>
                         </div>
                         {% include "novel/_modal_edit_novel.html" %}
@@ -42,11 +42,12 @@
     </div>
 </div>
 
-<div class="bg-white ">
+{% comment %} メッセージを入力する場所 {% endcomment %}
+<div class="bg-white fixed-bottom" style="--bs-bg-opacity: .5;">
     <div class="container">
         <div class="row message_field">
             <div class="col-md-10 mx-auto">
-                <form action="" method='POST' class='m-3'>
+                <form action="{{ request.path }}" method='POST' class='m-3' id="sentence_new_form">
                     {% csrf_token %}
                         {{ character_form.character.errors }}
                         {% for widget in character_form.character %}
@@ -71,29 +72,107 @@
     </div>
 </div>
 
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 <script>
-    const imageInputs = document.querySelectorAll('.character-radio');
-    const imagePreview = document.getElementById('imagePreview');
+// 送信ボタンにイベントリスナーを設定。内部に Ajax 処理を記述
+$(document).ready(function() {
+    $("#sentence_new_form").submit(function(event) {
+        event.preventDefault();
 
-    imageInputs.forEach(input => {
-        input.addEventListener('change', function(event) {
-            const selectedRadio = event.target;
-            const selectedValue = selectedRadio.value;
-            const selectedImage = document.querySelector(`[for="char-${selectedValue}"] img`);
-
-            // 画像が選択されている場合のみ表示する
-            if (selectedImage) {
-                const img = document.createElement('img');
-                img.src = selectedImage.src;
-                img.width = 40; // 画像の幅を設定（任意）
-                img.heigth = 40;
-                img.classList.add('rounded-circle', 'character_img'); // クラスを追加
-                imagePreview.innerHTML = ''; // 既存の画像を削除
-                imagePreview.appendChild(img); // 新しい画像を表示
+        var form = $(this);
+        $.ajax({
+            url: form.prop("action"),
+            method: form.prop("method"),
+            data: form.serialize(),
+            timeout: 10000,
+            dataType: "json",
+        })
+        .done(function(data) {
+            if (data.success) {
+                var newMessageElement = $("#message_area").children().last()[0];
+                $("#message_area").append(
+                    "<div class='row justify-content-start'>" +
+                    "<span class='mb-1' id='speaker_name_new'>" + data.speaker_name + "</span>" +
+                    "<div class='d-flex align-items-start mb-3'>" +
+                    "<div class='me-2 text-center'>" +
+                    "<img src='" + data.speaker_icon + "' alt='" + data.speaker_name + "' class='rounded-circle character_img' width='40' height='40'>" +
+                    "</div>" +
+                    "<div class='bg-body-secondary p-3 rounded flex-wrap'>" +
+                    "<p class='mb-0'>" + data.sentence_text + "</p>" +
+                    "</div>" +
+                    "</div>" +
+                    "</div>"
+                );
+                form.find("input[type=text], textarea").val("");
+                setTimeout(function() {
+                    newMessageElement.scrollIntoView({ behavior: "smooth" });
+                }, 10);
+            }else {
+                var errorMessages = "";
+                for (var field in data.errors) {
+                    if (data.errors.hasOwnProperty(field)) {
+                        errorMessages += field + ": " + data.errors[field].join(", ") + "<br>";
+                    }
+                }
+                $("#result").html("<p class='text-danger'>" + errorMessages + "</p>");
             }
+        })
+        .fail(function(xhr, status, error) {
+            alert('リクエストが失敗しました')
+        })
+    });
+});
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInputs = document.querySelectorAll('.character-radio');
+        const imagePreview = document.getElementById('imagePreview');
+        const textInput = document.getElementById('textInput');
+        const sentenceTexts = document.querySelectorAll('.sentence-text');
+
+        // 最初のラジオボタンをデフォルトで選択し、対応する画像を表示
+        const defaultRadio = document.querySelector('.character-radio');
+        if (defaultRadio) {
+            defaultRadio.checked = true; // 最初のラジオボタンを選択
+            const defaultImage = document.querySelector(`[for="char-${defaultRadio.value}"] img`);
+            if (defaultImage) {
+                const img = document.createElement('img');
+                img.src = defaultImage.src;
+                img.width = 40;
+                img.height = 40;
+                img.classList.add('rounded-circle', 'character_img');
+                imagePreview.appendChild(img);
+            }
+        }
+
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function(event) {
+                const selectedRadio = event.target;
+                const selectedValue = selectedRadio.value;
+                const selectedImage = document.querySelector(`[for="char-${selectedValue}"] img`);
+
+                // 画像が選択されている場合のみ表示する
+                if (selectedImage) {
+                    const img = document.createElement('img');
+                    img.src = selectedImage.src;
+                    img.width = 40; // 画像の幅を設定（任意）
+                    img.height = 40;
+                    img.classList.add('rounded-circle', 'character_img'); // クラスを追加
+                    imagePreview.innerHTML = ''; // 既存の画像を削除
+                    imagePreview.appendChild(img); // 新しい画像を表示
+                }
+            });
+        });
+
+        // 文章をクリックしたときに入力フィールドにテキストを設定
+        sentenceTexts.forEach(sentence => {
+            sentence.addEventListener('click', function(event) {
+                const text = event.currentTarget.getAttribute('sentence-text');
+                textInput.value = text;
+            });
         });
     });
 </script>
-
 
 {% endblock %}

@@ -77,13 +77,34 @@ class NovelDetailView(View):
             return redirect('text_app:detail_novel', pk=pk)
 
         if sentence_form.is_valid() and character_form.is_valid():
-            sentence = sentence_form.save(commit=False)
-            sentence.novel = novel
-            sentence.save()
-            character = character_form.cleaned_data['character']
-            sentence.speaker.add(character)
-            sentence.save()
-            return redirect('text_app:detail_novel', pk=pk)
+            print(f'リクエスト：{request}')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                """Ajax非同期処理を実行"""
+                print('非同期処理を実行します。')
+                sentence = sentence_form.save(commit=False)
+                sentence.novel = novel
+                sentence.save()
+                character = character_form.cleaned_data['character']
+                sentence.speaker.add(character)
+                sentence.save()
+                return JsonResponse({
+                    'success': True,
+                    'speaker_name': character.name,
+                    'speaker_icon': character.icon.url,
+                    'sentence_text': sentence.text,
+                })
+                # return redirect('text_app:detail_novel', pk=pk)
+        else:
+            print('失敗')
+            errors = {
+                'sentence_form_errors': sentence_form.errors,
+                'character_form_errors': character_form.errors,
+            }
+            return JsonResponse({
+                'success': False,
+                'errors': errors,
+                'message': '非同期処理に失敗しました。'
+            })
 
         messages.error(request, '小説の保存に失敗しました。')
         return render(request, self.template_name, {
@@ -91,6 +112,7 @@ class NovelDetailView(View):
             'character_form': character_form,
             'novel': novel,
         })
+
 
 class NovelEditView(View):
     def get_novel_or_redirect(self, pk):

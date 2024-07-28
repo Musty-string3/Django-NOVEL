@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views import View
 from django.db.models import Count
+from django.http import JsonResponse
 
 from .models import *
 from .forms import *
@@ -90,7 +91,6 @@ class NovelDetailView(View):
             'character_form': character_form,
             'novel': novel,
         })
-
 
 class NovelEditView(View):
     def get_novel_or_redirect(self, pk):
@@ -209,3 +209,35 @@ class SentenceDeleteView(View):
 
         messages.info(request, "文章を削除しました。")
         return redirect('text_app:detail_novel', pk=sentence.novel.id)
+
+
+
+class GreetView(View):
+    template_name = 'Ajax/index.html'
+    greet_form = GreetForm()
+
+    def get(self, request, *args, **kwargs):
+        greet_form = GreetForm()
+        return render(request, self.template_name, {
+            "greet_form": greet_form,
+        })
+
+    def post(self, request, *args, **kwargs):
+        form = GreetForm(request.POST)
+        print(f'リクエスト：{request}')
+        if form.is_valid():
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                """Ajax非同期処理を実行"""
+                print('非同期処理を実行します。')
+                name = self.ajax_response(form)
+                return JsonResponse({'success': True, 'name': name, 'message': '非同期処理に成功しました。'})
+        else:
+            print('失敗')
+            return JsonResponse({'success': False, 'errors': form.errors, 'message': '非同期処理に失敗しました。'})
+        return redirect('text_app:greet')
+
+
+    def ajax_response(self, form):
+        """jQueryに対してレスポンスを返すメソッド"""
+        name = form.cleaned_data.get("name")
+        return name

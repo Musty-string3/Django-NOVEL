@@ -16,4 +16,6 @@ urlpatterns = [
 
     path('sentence/<int:pk>/edit', views.SentenceEditView.as_view(), name='edit_sentence'),
     path('sentence/<int:pk>/delete', views.SentenceDeleteView.as_view(), name='delete_sentence'),
+
+    path('greet/', views.GreetView.as_view(), name='greet'),
 ]

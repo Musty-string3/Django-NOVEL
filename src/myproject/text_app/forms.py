@@ -65,3 +65,7 @@ class CharacterCreateForm(forms.ModelForm):
                 'class': 'form-control-file',
             }),
         }
+
+
+class GreetForm(forms.Form):
+    name = forms.CharField(label='あなたの名前は？')

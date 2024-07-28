@@ -7,10 +7,12 @@
     <div class="row justify-content-center">
         <div class="col-8 mx-auto">
             <h1 class="text-center">非同期処理</h1>
-            <form action="{{ request.path }}" method="post" id="greet-form" class="form-control">
+            <form action="{{ request.path }}" method="post" id="greet-form">
                 {% csrf_token %}
-                {{ greet_form.as_p }}
-                <button type="submit" class="btn btn-success">送信</button>
+                <div class="form-group">
+                    {{ greet_form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-success form-group">送信</button>
             </form>
             <div id="message" class="mt-4">
                 {% comment %} ここに非同期処理が入る（メッセージ） {% endcomment %}

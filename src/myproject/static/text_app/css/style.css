@@ -32,5 +32,9 @@
     border: 2px solid #000;
 }
 .message_field {
-    margin-bottom: 50px;
+    margin-bottom: 20px;
+}
+
+.message_field_bottom {
+    margin-bottom: 10rem !important;;
 }

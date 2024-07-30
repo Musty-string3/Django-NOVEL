@@ -21,6 +21,7 @@
             <a href="#">リンク先作ってない{{ novel.created_by.username }}</a>
         </p>
         <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#NovelEditModal">編集</button>
+        {% include "novel/_modal_edit_novel.html" %}
     </div>
     <div class="col-md-8 col-10 mx-auto message_field_bottom" id="message_area">
         <div class="row justify-content-start">
@@ -31,10 +32,11 @@
                         <div class="me-2 text-center">
                             <img src="{{ speaker.icon.url }}" alt="{{ speaker.name }}" class="rounded-circle character_img" id='speaker_icon_{{ speaker.id }}' width="40" height="40">
                         </div>
-                        <div class="bg-body-secondary p-3 rounded flex-wrap" id='sentence_text_{{ sentence.id }}'>
-                            <p class='mb-0'>{{ sentence.text }}</p>
-                        </div>
-                        {% include "novel/_modal_edit_novel.html" %}
+                        <a href="{% url 'text_app:edit_sentence' sentence.id %}" class="">
+                            <div class="bg-body-secondary p-3 rounded flex-wrap" id='sentence_text_{{ sentence.id }}'>
+                                <p class='mb-0'>{{ sentence.text }}</p>
+                            </div>
+                        </a>
                     </div>
                 {% endfor %}
             {% endfor %}
@@ -47,26 +49,11 @@
     <div class="container">
         <div class="row message_field">
             <div class="col-md-10 mx-auto">
-                <form action="{{ request.path }}" method='POST' class='m-3' id="sentence_new_form">
-                    {% csrf_token %}
-                        {{ character_form.character.errors }}
-                        {% for widget in character_form.character %}
-                            <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
-                            <label for="char-{{ widget.data.value }}" class="character-label">
-                                <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}" class="rounded-circle character_img" width="40" height="40">
-                            </label>
-                        {% endfor %}
-                    <div class="form-group row  mt-1">
-                        <div class='col-1 text-center' id="imagePreview"></div>
-                        <div class='col-8'>
-                            {% for widget in sentence_form.text %}
-                                <input type="text" placeholder='テキストを入力' class='form-control' name='text'>
-                            {% endfor %}
-                        </div>
-                        <button class='col-2 btn btn-success'>送信</button>
-                        {% comment %} <a href="{% url 'text_app:delete_sentence' sentence.id %}" class="btn btn-danger">削除</a> {% endcomment %}
-                    </div>
-                </form>
+                {% if not 'sentence' in request.path %}
+                    {% include "sentence/_sentece_create_form.html" %}
+                {% else %}
+                    {% include "sentence/_sentece_edit_form.html" %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -90,20 +77,24 @@ $(document).ready(function() {
         })
         .done(function(data) {
             if (data.success) {
+                {% comment %} ここで文章を非同期で生成して表示する {% endcomment %}
                 var newMessageElement = $("#message_area").children().last()[0];
-                $("#message_area").append(
-                    "<div class='row justify-content-start'>" +
-                    "<span class='mb-1' id='speaker_name_new'>" + data.speaker_name + "</span>" +
-                    "<div class='d-flex align-items-start mb-3'>" +
-                    "<div class='me-2 text-center'>" +
-                    "<img src='" + data.speaker_icon + "' alt='" + data.speaker_name + "' class='rounded-circle character_img' width='40' height='40'>" +
-                    "</div>" +
-                    "<div class='bg-body-secondary p-3 rounded flex-wrap'>" +
-                    "<p class='mb-0'>" + data.sentence_text + "</p>" +
-                    "</div>" +
-                    "</div>" +
-                    "</div>"
-                );
+                var newSentence = `
+                    <div class='row justify-content-start'>
+                        <span class="mb-1" id='speaker_name_${data.speaker_id}'>${data.speaker_name}</span>
+                        <div class='d-flex align-items-start mb-3'>
+                            <div class="me-2 text-center">
+                                <img src="${data.speaker_icon}" alt="${data.speaker_name}" class="rounded-circle character_img" id='speaker_icon_${data.speaker_id}' width="40" height="40">
+                            </div>
+                            <a href="/path/to/edit/${data.sentence_id}" class="">
+                                <div class="bg-body-secondary p-3 rounded flex-wrap" id='sentence_text_${data.sentence_id}'>
+                                    <p class='mb-0'>${data.sentence_text}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                $("#message_area").append(newSentence);
                 form.find("input[type=text], textarea").val("");
                 setTimeout(function() {
                     newMessageElement.scrollIntoView({ behavior: "smooth" });

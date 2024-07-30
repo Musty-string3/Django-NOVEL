@@ -1,0 +1,18 @@
+<form action="{% url 'text_app:edit_sentence' sentence.id %}" method='POST' class='m-3' id="sentence_edit_form">
+    {% csrf_token %}
+        {{ character_form.character.errors }}
+        {% for widget in character_form.character %}
+            <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
+            <label for="char-{{ widget.data.value }}" class="character-label">
+                <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}" class="rounded-circle character_img" width="40" height="40">
+            </label>
+        {% endfor %}
+    <div class="form-group row mt-1">
+        <div class='col-1 text-center' id="imagePreview"></div>
+        <div class='col-7'>
+            {{ sentence_form.text }}
+        </div>
+        <button class='col-2 btn btn-success'>送信</button>
+        <a href="{% url 'text_app:delete_sentence' sentence.id %}" class="col-1 btn btn-danger">削除</a>
+    </div>
+</form>

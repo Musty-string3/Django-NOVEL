@@ -93,7 +93,6 @@ class NovelDetailView(View):
                     'speaker_icon': character.icon.url,
                     'sentence_text': sentence.text,
                 })
-                # return redirect('text_app:detail_novel', pk=pk)
         else:
             print('失敗')
             errors = {
@@ -208,16 +207,53 @@ class CharacterDeleteView(View):
 
 
 class SentenceEditView(View):
-    def post(self, request, pk, *args, **kwargs):
-        print(pk)
+    template_name = 'novel/detail.html'
+    def get_sentence_object(self, pk):
         try:
-            sentence = Sentence.objects.get(pk=pk)
+            return Sentence.objects.get(pk=pk)
         except Sentence.DoesNotExist:
-            messages.error(request, "指定された文章は存在しません")
+            messages.error(self.request, "指定された文章は存在しません")
+            return False
+
+    def get(self, request, pk, *args, **kwargs):
+        sentence = self.get_sentence_object(pk)
+        if not sentence:
             return redirect("text_app:index_novel", pk=pk)
-        print("文章の編集")
-        messages.info(request, "文章の編集を行いました。")
-        return redirect("text_app:detail_novel", pk=sentence.novel.id)
+
+        sentence_edit_form = SentenceForm(instance=sentence)
+        character = sentence.speaker.first()
+        character_edit_form = CharacterForm()
+        novel_edit_form = NovelForm(instance=sentence.novel)
+        novel = Novel.objects.get(id=sentence.novel.id)
+        sentences = Sentence.objects.filter(novel=novel).prefetch_related('speaker')
+
+        return render(request, self.template_name, {
+            "sentence":       sentence,
+            "sentence_form":  sentence_edit_form,
+            "character_form": character_edit_form,
+            "novel_edit_form":     novel_edit_form,
+            "novel":               novel,
+            "sentences":           sentences,
+        })
+
+    def post(self, request, pk, *args, **kwargs):
+        sentence = self.get_sentence_object(pk)
+
+        sentence_form = SentenceForm(request.POST, instance=sentence)
+        character_form = CharacterForm(request.POST)
+        novel = sentence.novel
+        print(f'リクエスト：{request}')
+        if sentence_form.is_valid() and character_form.is_valid():
+            sentence = sentence_form.save(commit=False)
+            sentence.novel = novel
+            sentence.save()
+            character = character_form.cleaned_data['character']
+            # TODO: 編集時に新しくデータが作成されるので直す
+            if character not in sentence.speaker.all():
+                sentence.speaker.add(character)
+            sentence.save()
+            messages.info(request, "文章の編集を行いました。")
+            return redirect('text_app:detail_novel', pk=sentence.novel.id)
 
 
 class SentenceDeleteView(View):

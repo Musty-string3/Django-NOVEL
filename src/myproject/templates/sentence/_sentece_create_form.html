@@ -1,0 +1,17 @@
+<form action="{% url 'text_app:detail_novel' novel.id %}" method='POST' class='m-3' id="sentence_new_form">
+    {% csrf_token %}
+        {{ character_form.character.errors }}
+        {% for widget in character_form.character %}
+            <input type="radio" id="char-{{ widget.data.value }}" class="character-radio" name="character" value="{{ widget.data.value }}">
+            <label for="char-{{ widget.data.value }}" class="character-label">
+                <img src="{{ widget.choice_label.icon.url }}" alt="{{ widget.choice_label.name }}" class="rounded-circle character_img" width="40" height="40">
+            </label>
+        {% endfor %}
+    <div class="form-group row  mt-1">
+        <div class='col-1 text-center' id="imagePreview"></div>
+        <div class='col-8'>
+            {{ sentence_form.text }}
+        </div>
+        <button class='col-2 btn btn-success'>送信</button>
+    </div>
+</form>

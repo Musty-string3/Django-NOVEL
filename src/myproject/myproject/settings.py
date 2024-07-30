@@ -160,19 +160,21 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 # django-allauthで利用するjdango.contrib.sitesを使うためにサイト識別用IDを設定
 SITE_ID = 1
 
-AUTHENTICATION_BACKENDS = (
+AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
     # 一般ユーザー用(メールアドレス認証)
     'django.contrib.auth.backends.ModelBackend',
     # 管理サイト用(ユーザー名認証)
-)
+]
 
-# メールアドレス認証に変更する設定
+# 認証方式を「メルアドとパスワード」に設定
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ユーザ名は使用しない
 ACCOUNT_USERNAME_REQUIRED = False
 
-# サインアップにメールアドレス確認をはさむよう設定
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# ユーザ登録時に確認メールを送信するか(none=送信しない, mandatory=送信する)
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+# ユーザ登録にメルアド必須にする
 ACCOUNT_EMAIL_REQUIRED = True
 
 # ログイン/ログアウト後の遷移先を設定
